@@ -2,7 +2,7 @@
 
 Find good and bad games
 
-## Setup
+## Setup (for python version)
 
 * Install Python version >= 3.11.0
 * Install the python chess package
