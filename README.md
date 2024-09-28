@@ -1,19 +1,31 @@
-# Game Selector
+# Game Selector 2
 
 Find good and bad games
 
 ## Setup
 
-* Install Python version >= 3.7
+* Install Python version >= 3.11.0
 * Install the python chess package
   ```
-  pip install chess==1.9.3
+  pip install chess
+  
+  pip install colorama
+  
+  pip install tk            (for gui)
+  
+  pip install psutil        (for gui)
+  
+  pip install Pillow        (for gui)
+  
+  pip install requests      (for gui)
+  
+  
   ```
 
 ## Help
 
 ```
-usage: game-selector [-h] --input INPUT --output-good OUTPUT_GOOD --output-bad
+usage: selector [-h] --input INPUT --output-good OUTPUT_GOOD --output-bad
                      OUTPUT_BAD --engine ENGINE [--hash HASH] [--threads THREADS]      
                      [--move-time-sec MOVE_TIME_SEC] [--score-margin SCORE_MARGIN] [-v]
 
@@ -36,22 +48,17 @@ options:
   -v, --version         show program's version number and exit
 ```
 
+
 ## Command line
 
 ```
-python main.py --input mygames.pgn --output-good good.pgn --output-bad bad.pgn --engine stockfish_15_modern.exe --hash 128 --threads 1 --move-time-sec 2
+python selector.py --input mygames.pgn --output-good good.pgn --output-bad bad.pgn --engine stockfish.exe --hash 128 --threads 1 --move-time-sec 2
 ```
 
 ```
-./gamecollector.exe --input mygames.pgn --output-good good.pgn --output-bad bad.pgn --engine stockfish_15_modern.exe --hash 128 --threads 1 --move-time-sec 2
+selector.exe --input mygames.pgn --output-good good.pgn --output-bad bad.pgn --engine stockfish.exe --hash 128 --threads 1 --move-time-sec 2
 ```
 
-## Clone the repository
 
-Copy all files in this repository.
-
-```
-git clone https://github.com/fsmosca/gameselector.git
-```
 
 
