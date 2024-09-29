@@ -43,6 +43,7 @@ class GameSelectorApp:
         self.hash_entry = tk.Entry(master, bg='black', fg='white')
         self.hash_entry.insert(0, "128")
         self.hash_entry.pack()
+        self.hash_entry.bind("<FocusIn>", self.show_cursor)
 
         self.threads_label = tk.Label(master, text="Enter Number of Threads:", bg='black', fg='white')
         self.threads_label.pack()
@@ -50,6 +51,7 @@ class GameSelectorApp:
         self.threads_entry = tk.Entry(master, bg='black', fg='white')
         self.threads_entry.insert(0, "4")
         self.threads_entry.pack()
+        self.threads_entry.bind("<FocusIn>", self.show_cursor)
 
         self.margin_label = tk.Label(master, text="Enter Score Margin: (pawn unit)", bg='black', fg='white')
         self.margin_label.pack()
@@ -57,6 +59,7 @@ class GameSelectorApp:
         self.margin_entry = tk.Entry(master, bg='black', fg='white')
         self.margin_entry.insert(0, "5.0")
         self.margin_entry.pack()
+        self.margin_entry.bind("<FocusIn>", self.show_cursor)
 
         self.move_time_label = tk.Label(master, text="Enter Move Time (seconds):", bg='black', fg='white')
         self.move_time_label.pack()
@@ -64,6 +67,7 @@ class GameSelectorApp:
         self.move_time_entry = tk.Entry(master, bg='black', fg='white')
         self.move_time_entry.insert(0, "2")
         self.move_time_entry.pack()
+        self.move_time_entry.bind("<FocusIn>", self.show_cursor)
 
         self.run_button = tk.Button(master, text="Run", command=self.run_game_selector, bg='lightgreen')
         self.run_button.pack()
@@ -174,6 +178,9 @@ class GameSelectorApp:
     def on_closing(self):
         self.master.attributes('-topmost', 1)
         self.master.after_idle(self.master.attributes, '-topmost', 0)
+
+    def show_cursor(self, event):
+        event.widget.config(insertbackground='white')
 
 if __name__ == "__main__":
     root = tk.Tk()
