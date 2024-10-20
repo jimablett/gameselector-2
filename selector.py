@@ -12,13 +12,14 @@ os.system('cls' if os.name == 'nt' else 'clear')
 
 __script_name__ = 'game-selector 2'
 __goal__ = 'Separate good and bad games'
-__version__ = '0.2.2_JA'
+__version__ = '0.2.5_JA'
 
 
 def print_progress(iteration, total, prefix=''):
-    percent = (iteration / total) * 100 * 44  
-    if percent > 100: 
-        percent = 100
+    percent = (iteration  / total) * 1000
+    percent *=2.5
+    if total > 0:
+        percent = min(percent, 100)
     sys.stdout.write(f'\r{colorama.Fore.GREEN}{prefix} : {percent:.0f}% Complete')
     sys.stdout.flush()
 
@@ -57,6 +58,13 @@ def main():
     not_removed_games = []
 
     engine = chess.engine.SimpleEngine.popen_uci(enginefn)
+    
+    report_data = {
+        'wins_on_time': [],
+        'illegal_moves': [],
+        'crashed_games': [],
+        'drawn_in_winning_position': []
+    }
 
     with open(fn) as h:
         total_games = sum(1 for _ in h)
@@ -64,15 +72,17 @@ def main():
 
         while True:
             game = chess.pgn.read_game(h)
+            
+            print_progress(cnt, total_games, prefix='Processing games')  
+            
             if game is None:
                 break
             cnt += 1
-            print_progress(cnt, total_games, prefix='Processing games')
-
+            
             result = game.headers['Result']
             is_bad = False
             is_save = True
-
+            
             for node in game.mainline():
                 parent_node = node.parent
                 comment = node.comment                
@@ -97,7 +107,19 @@ def main():
                     board = chess.Board(fen)
                     info = engine.analyse(board, chess.engine.Limit(time=movetimesec))
                     score_wpov = info['score'].white().score(mate_score=32000)
-                    score_wpov/=100
+                    score_wpov /= 100
+                    
+                    if 'wins on time' in comment:
+                        report_data['wins_on_time'].append(str(game))
+                    elif any(keyword in comment for keyword in [
+                        'Arena Adjudication. Illegal move!', 
+                        'polyglot: resign (illegal engine move', 
+                        'Forfeit due to invalid move']):
+                        report_data['illegal_moves'].append(str(game))
+                    elif 'exited unexpectedly' in comment:
+                        report_data['crashed_games'].append(str(game))
+                    elif 'but bare king} 1/2-1/2' in comment:
+                        report_data['drawn_in_winning_position'].append(str(game))
 
                     if (result == '0-1' and score_wpov > -score_margin) or \
                        (result == '1/2-1/2' and score_wpov > -score_margin) or \
@@ -112,7 +134,7 @@ def main():
                         print(f' ')
                         is_save = True
                     break
-
+                    
             if is_save:
                 with open(output_goodfn, 'a') as f:
                     f.write(f'{game}\n\n')
@@ -125,9 +147,15 @@ def main():
     with open('kept games_(score_margin_reached).txt', 'w') as f:
         for game in not_removed_games:
             f.write(f'{game}\n\n')
-            
-    print(f'{colorama.Fore.GREEN}\n\nProcessing games : 100% Complete')
-   
+
+    report_file_path = os.path.join('output', 'report.txt')
+    with open(report_file_path, 'w') as report_file:
+        for category, games in report_data.items():
+            report_file.write(f"\n***********************************:\n**** {category} ****:\n***********************************:\n" + "\n".join(games) + "\n\n")
+
+    os.rename('kept games_(score_margin_reached).txt', os.path.join('output', 'kept games_(score_margin_reached).txt'))
+
+    print_progress(total_games, total_games, prefix='Processing games')
    
     print('\nProcessing complete.')
 
