@@ -11,7 +11,7 @@ import pkg_resources
 import requests
 import base64
 import sys
-
+import json
 
 class GameSelectorApp:
     def __init__(self, master):
@@ -67,6 +67,13 @@ class GameSelectorApp:
         self.move_time_entry.pack()
         self.move_time_entry.bind("<FocusIn>", self.show_cursor)
 
+        self.keep_settings_var = tk.BooleanVar()
+        self.keep_settings_checkbox = tk.Checkbutton(master, text="Save Settings", variable=self.keep_settings_var, command=self.save_settings, bg='darkgrey')
+        self.keep_settings_checkbox.pack()
+
+        self.restore_defaults_button = tk.Button(master, text="Restore Default Settings", command=self.restore_defaults, bg='darkgrey')
+        self.restore_defaults_button.pack()
+
         self.run_button = tk.Button(master, text="Run", command=self.run_game_selector, bg='lightgreen')
         self.run_button.pack()
 
@@ -88,6 +95,7 @@ class GameSelectorApp:
 
         self.create_default_files()
         self.load_default_engine()
+        self.load_settings()
 
     def create_default_files(self):
         with open(self.output_good_file, "w") as good_file:
@@ -139,7 +147,7 @@ class GameSelectorApp:
         move_time_value = self.move_time_entry.get()
 
         command = [
-            'selector.exe',        
+            'python.exe','selector.py',        
             '--input', self.input_file,
             '--output-good', self.output_good_file,
             '--output-bad', self.output_bad_file,
@@ -150,7 +158,7 @@ class GameSelectorApp:
             '--move-time-sec', move_time_value
         ]
 
-        if not os.path.exists('selector.exe'):
+        if not os.path.exists('selector.py'):
             messagebox.showerror("Error", "selector.exe not found in directory.")
             return
 
@@ -210,6 +218,41 @@ class GameSelectorApp:
 
     def show_cursor(self, event):
         event.widget.config(insertbackground='white')
+
+    def save_settings(self):
+        if self.keep_settings_var.get():
+            settings = {
+                "hash": self.hash_entry.get(),
+                "threads": self.threads_entry.get(),
+                "score_margin": self.margin_entry.get(),
+                "move_time": self.move_time_entry.get()
+            }
+            with open("settings.json", "w") as f:
+                json.dump(settings, f)
+
+    def load_settings(self):
+        if os.path.exists("settings.json"):
+            with open("settings.json", "r") as f:
+                settings = json.load(f)
+                self.hash_entry.delete(0, tk.END)
+                self.hash_entry.insert(0, settings.get("hash", "128"))
+                self.threads_entry.delete(0, tk.END)
+                self.threads_entry.insert(0, settings.get("threads", "4"))
+                self.margin_entry.delete(0, tk.END)
+                self.margin_entry.insert(0, settings.get("score_margin", "5.0"))
+                self.move_time_entry.delete(0, tk.END)
+                self.move_time_entry.insert(0, settings.get("move_time", "2"))
+
+    def restore_defaults(self):
+        self.hash_entry.delete(0, tk.END)
+        self.hash_entry.insert(0, "128")
+        self.threads_entry.delete(0, tk.END)
+        self.threads_entry.insert(0, "4")
+        self.margin_entry.delete(0, tk.END)
+        self.margin_entry.insert(0, "5.0")
+        self.move_time_entry.delete(0, tk.END)
+        self.move_time_entry.insert(0, "2")
+        self.keep_settings_var.set(False)
 
 if __name__ == "__main__":
     root = tk.Tk()
