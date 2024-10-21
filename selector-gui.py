@@ -110,8 +110,18 @@ class GameSelectorApp:
             self.engine_label.config(text=os.path.basename(self.engine_file))
 
     def load_input_file(self):
+        self.clear_output_folder()
         self.input_file = filedialog.askopenfilename(filetypes=[("PGN files", "*.pgn")])
         self.label.config(text=os.path.basename(self.input_file))
+
+    def clear_output_folder(self):
+        for filename in os.listdir(self.output_dir):
+            file_path = os.path.join(self.output_dir, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
 
     def load_engine_file(self):
         self.engine_file = filedialog.askopenfilename(filetypes=[("Engine files", "*.exe;*.bin")])
@@ -147,7 +157,7 @@ class GameSelectorApp:
         move_time_value = self.move_time_entry.get()
 
         command = [
-            'python.exe','selector.py',        
+            'selector.exe',        
             '--input', self.input_file,
             '--output-good', self.output_good_file,
             '--output-bad', self.output_bad_file,
@@ -158,7 +168,7 @@ class GameSelectorApp:
             '--move-time-sec', move_time_value
         ]
 
-        if not os.path.exists('selector.py'):
+        if not os.path.exists('selector.exe'):
             messagebox.showerror("Error", "selector.exe not found in directory.")
             return
 
