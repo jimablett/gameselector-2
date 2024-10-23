@@ -157,7 +157,7 @@ class GameSelectorApp:
         move_time_value = self.move_time_entry.get()
 
         command = [
-            'selector.exe',        
+            'python.exe','selector.py',        
             '--input', self.input_file,
             '--output-good', self.output_good_file,
             '--output-bad', self.output_bad_file,
@@ -168,8 +168,8 @@ class GameSelectorApp:
             '--move-time-sec', move_time_value
         ]
 
-        if not os.path.exists('selector.exe'):
-            messagebox.showerror("Error", "selector.exe not found in directory.")
+        if not os.path.exists('selector.py'):
+            messagebox.showerror("Error", "selector.py not found in directory.")
             return
 
         self.progress.start()
