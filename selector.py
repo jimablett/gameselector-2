@@ -108,7 +108,9 @@ def main():
         'wins_on_time': {'White': 0, 'Black': 0},
         'illegal_moves': {'White': 0, 'Black': 0},
         'crashed_games': {'White': 0, 'Black': 0},
-        'drawn_in_winning_position': {'White': 0, 'Black': 0}
+        'drawn_in_winning_position': {'White': 0, 'Black': 0},
+        'false illegal move claim': {'White': 0, 'Black': 0},
+        'false draw claim fifty move rule': {'White': 0, 'Black': 0}    
     }
 
     with open(fn) as h:
@@ -140,6 +142,8 @@ def main():
                     'polyglot: resign (illegal engine move', 
                     'Forfeit due to invalid move', 
                     'wins on time', 
+                    'False illegal-move claim',
+                    "False draw claim: 'Fifty move rule'",
                     'exited unexpectedly']):
                     is_bad = True
 
@@ -214,6 +218,10 @@ def main():
                         report_data['crashed_games']['White' if result == '0-1' else 'Black'] += 1
                     elif 'but bare king} 1/2-1/2' in comment:
                         report_data['drawn_in_winning_position']['White' if result == '1/2-1/2' else 'Black'] += 1
+                    elif 'False illegal-move claim' in comment:
+                        report_data['false illegal move claim']['White' if result == '0-1' else 'Black'] += 1
+                    elif  "False draw claim: 'Fifty move rule'" in comment:
+                        report_data['false draw claim fifty move rule']['White' if result == '0-1' else 'Black'] += 1
                 
                 report_lines = []
                 if result == '0-1' or result == '1-0' or result == '1/2-1/2' :
@@ -233,13 +241,11 @@ def main():
                     report_lines.append(f"game lost by crash [White]")
                     report_data['crashed_games']['White'] = 0            
                     player_totals[f"{white_engine_name}_total_bad_games"] += 1
-                
-                
+                           
                 elif report_data['crashed_games']['Black'] > 0:
                     report_lines.append(f"game lost by crash [Black]")
                     report_data['crashed_games']['Black'] = 0            
-                    player_totals[f"{black_engine_name}_total_bad_games"] += 1
-                
+                    player_totals[f"{black_engine_name}_total_bad_games"] += 1             
                 
                 elif report_data['illegal_moves']['White'] > 0:
                     report_lines.append(f"game lost by illegal move [White]")                             
@@ -261,6 +267,25 @@ def main():
                     report_data['drawn_in_winning_position']['Black'] = 0
                     player_totals[f"{black_engine_name}_total_bad_games"] += 1
                     
+                elif report_data['false illegal move claim']['White'] > 0:
+                    report_lines.append(f"false illegal move claim [White]")
+                    report_data['false illegal move claim']['White'] = 0
+                    player_totals[f"{white_engine_name}_total_bad_games"] += 1
+                    
+                elif report_data['false illegal move claim']['Black'] > 0:
+                    report_lines.append(f"false illegal move claim [Black]")
+                    report_data['false illegal move claim']['Black'] = 0
+                    player_totals[f"{black_engine_name}_total_bad_games"] += 1
+                            
+                elif report_data['false draw claim fifty move rule']['White'] > 0:
+                    report_lines.append(f"false draw claim fifty move rule [White]")                  
+                    report_data['false draw claim fifty move rule']['White'] = 0
+                    player_totals[f"{black_engine_name}_total_bad_games"] += 1
+                    
+                elif report_data['false draw claim fifty move rule']['Black'] > 0:
+                    report_lines.append(f"false draw claim fifty move rule [Black]")                  
+                    report_data['false draw claim fifty move rule']['Black'] = 0
+                    player_totals[f"{black_engine_name}_total_bad_games"] += 1
                     
                 with open(os.path.join('output', 'players_bad_games.txt'), 'a') as players_file:
                     players_file.write("\n".join(report_lines) + "\n\n")
