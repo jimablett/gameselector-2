@@ -14,7 +14,7 @@ os.system('cls' if os.name == 'nt' else 'clear')
 
 __script_name__ = '    game-selector 2'
 __goal__ = 'Separate good and bad games'
-__version__ = '0.2.6_JA'
+__version__ = '0.2.7_JA'
 
 
 def print_progress(iteration, total, prefix=''):
@@ -110,7 +110,8 @@ def main():
         'crashed_games': {'White': 0, 'Black': 0},
         'drawn_in_winning_position': {'White': 0, 'Black': 0},
         'false illegal move claim': {'White': 0, 'Black': 0},
-        'false draw claim fifty move rule': {'White': 0, 'Black': 0}    
+        'false draw claim fifty move rule': {'White': 0, 'Black': 0},  
+        'false draw claim offer draw': {'White': 0, 'Black': 0}  
     }
 
     with open(fn) as h:
@@ -144,7 +145,8 @@ def main():
                     'wins on time', 
                     'False illegal-move claim',
                     "False draw claim: 'Fifty move rule'",
-                    'exited unexpectedly']):
+                    'exited unexpectedly',
+                    "False draw claim: 'offer draw'"]):
                     is_bad = True
 
                 if is_bad:
@@ -222,6 +224,8 @@ def main():
                         report_data['false illegal move claim']['White' if result == '0-1' else 'Black'] += 1
                     elif  "False draw claim: 'Fifty move rule'" in comment:
                         report_data['false draw claim fifty move rule']['White' if result == '0-1' else 'Black'] += 1
+                    elif "False draw claim: 'offer draw'" in comment:
+                        report_data['false draw claim offer draw']['White' if result == '0-1' else 'Black'] += 1
                 
                 report_lines = []
                 if result == '0-1' or result == '1-0' or result == '1/2-1/2' :
@@ -280,12 +284,23 @@ def main():
                 elif report_data['false draw claim fifty move rule']['White'] > 0:
                     report_lines.append(f"false draw claim fifty move rule [White]")                  
                     report_data['false draw claim fifty move rule']['White'] = 0
-                    player_totals[f"{black_engine_name}_total_bad_games"] += 1
+                    player_totals[f"{white_engine_name}_total_bad_games"] += 1
                     
                 elif report_data['false draw claim fifty move rule']['Black'] > 0:
                     report_lines.append(f"false draw claim fifty move rule [Black]")                  
                     report_data['false draw claim fifty move rule']['Black'] = 0
                     player_totals[f"{black_engine_name}_total_bad_games"] += 1
+                    
+                elif report_data['false draw claim offer draw']['White'] > 0:
+                    report_lines.append(f"false draw claim 'offer draw' [Black]")                  
+                    report_data['false draw claim offer draw']['White'] = 0
+                    player_totals[f"{white_engine_name}_total_bad_games"] += 1
+                             
+                elif report_data['false draw claim offer draw']['Black'] > 0:
+                    report_lines.append(f"false draw claim 'offer draw' [Black]")                  
+                    report_data['false draw claim offer draw']['Black'] = 0
+                    player_totals[f"{black_engine_name}_total_bad_games"] += 1
+                    
                     
                 with open(os.path.join('output', 'players_bad_games.txt'), 'a') as players_file:
                     players_file.write("\n".join(report_lines) + "\n\n")
