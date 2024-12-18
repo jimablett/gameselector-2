@@ -110,8 +110,7 @@ def main():
         'crashed_games': {'White': 0, 'Black': 0},
         'drawn_in_winning_position': {'White': 0, 'Black': 0},
         'false illegal move claim': {'White': 0, 'Black': 0},
-        'false draw claim fifty move rule': {'White': 0, 'Black': 0},  
-        'false draw claim offer draw': {'White': 0, 'Black': 0}  
+        'false draw claim': {'White': 0, 'Black': 0}   
     }
 
     with open(fn) as h:
@@ -144,9 +143,8 @@ def main():
                     'Forfeit due to invalid move', 
                     'wins on time', 
                     'False illegal-move claim',
-                    "False draw claim: 'Fifty move rule'",
                     'exited unexpectedly',
-                    "False draw claim: 'offer draw'"]):
+                    'False draw claim:']):
                     is_bad = True
 
                 if is_bad:
@@ -222,10 +220,9 @@ def main():
                         report_data['drawn_in_winning_position']['White' if result == '1/2-1/2' else 'Black'] += 1
                     elif 'False illegal-move claim' in comment:
                         report_data['false illegal move claim']['White' if result == '0-1' else 'Black'] += 1
-                    elif  "False draw claim: 'Fifty move rule'" in comment:
-                        report_data['false draw claim fifty move rule']['White' if result == '0-1' else 'Black'] += 1
-                    elif "False draw claim: 'offer draw'" in comment:
-                        report_data['false draw claim offer draw']['White' if result == '0-1' else 'Black'] += 1
+                    elif  'False draw claim:' in comment:
+                        report_data['false draw claim']['White' if result == '0-1' else 'Black'] += 1
+                   
                 
                 report_lines = []
                 if result == '0-1' or result == '1-0' or result == '1/2-1/2' :
@@ -281,24 +278,14 @@ def main():
                     report_data['false illegal move claim']['Black'] = 0
                     player_totals[f"{black_engine_name}_total_bad_games"] += 1
                             
-                elif report_data['false draw claim fifty move rule']['White'] > 0:
-                    report_lines.append(f"false draw claim fifty move rule [White]")                  
-                    report_data['false draw claim fifty move rule']['White'] = 0
+                elif report_data['false draw claim']['White'] > 0:
+                    report_lines.append(f"false draw claim [White]")                  
+                    report_data['false draw claim']['White'] = 0
                     player_totals[f"{white_engine_name}_total_bad_games"] += 1
                     
-                elif report_data['false draw claim fifty move rule']['Black'] > 0:
-                    report_lines.append(f"false draw claim fifty move rule [Black]")                  
-                    report_data['false draw claim fifty move rule']['Black'] = 0
-                    player_totals[f"{black_engine_name}_total_bad_games"] += 1
-                    
-                elif report_data['false draw claim offer draw']['White'] > 0:
-                    report_lines.append(f"false draw claim 'offer draw' [Black]")                  
-                    report_data['false draw claim offer draw']['White'] = 0
-                    player_totals[f"{white_engine_name}_total_bad_games"] += 1
-                             
-                elif report_data['false draw claim offer draw']['Black'] > 0:
-                    report_lines.append(f"false draw claim 'offer draw' [Black]")                  
-                    report_data['false draw claim offer draw']['Black'] = 0
+                elif report_data['false draw claim']['Black'] > 0:
+                    report_lines.append(f"false draw claim [Black]")                  
+                    report_data['false draw claim']['Black'] = 0
                     player_totals[f"{black_engine_name}_total_bad_games"] += 1
                     
                     
