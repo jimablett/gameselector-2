@@ -160,9 +160,9 @@ def main():
                     score_wpov /= 100                   
 
                     if (result == '0-1' and score_wpov > -score_margin) or \
-                       (result == '1/2-1/2' and score_wpov > -score_margin) or \
+                       (result == '1/2-1/2' and score_wpov > 0 and score_wpov > -score_margin) or \
                        (result == '1-0' and score_wpov < score_margin) or \
-                       (result == '1/2-1/2' and score_wpov < score_margin):
+                       (result == '1/2-1/2' and score_wpov > 0 and score_wpov < score_margin):
                         print(f'{colorama.Fore.RED}{colorama.Style.BRIGHT}will not keep this game, eval: {score_wpov} wpov{colorama.Style.RESET_ALL}')
                         print(f'\n ')
                         is_save = False
